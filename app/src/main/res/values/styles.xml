@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.XiaomiThermalEditor" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#111827</item>
+        <item name="android:navigationBarColor">#111827</item>
+        <item name="android:windowBackground">#111827</item>
+        <item name="android:textColorPrimary">#F9FAFB</item>
+    </style>
+</resources>
+

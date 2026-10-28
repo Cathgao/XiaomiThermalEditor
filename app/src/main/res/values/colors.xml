@@ -1,0 +1,10 @@
+<resources>
+    <color name="bg_main">#111827</color>
+    <color name="bg_card">#1F2937</color>
+    <color name="text_primary">#F9FAFB</color>
+    <color name="text_secondary">#9CA3AF</color>
+    <color name="color_primary">#2563EB</color>
+    <color name="color_accent">#10B981</color>
+    <color name="color_danger">#DC2626</color>
+</resources>
+

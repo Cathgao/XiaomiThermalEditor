@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/item_tier_bg"
+    android:elevation="4dp"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- 顶部标题栏：拖拽手柄、档位序号、删除按钮 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_drag_handle"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="拖拽排序"
+            android:padding="4dp"
+            android:src="@drawable/ic_drag_handle" />
+
+        <TextView
+            android:id="@+id/tv_tier_index"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="档位 #1"
+            android:textColor="#F3F4F6"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btn_delete_tier"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="删除档位"
+            android:padding="4dp"
+            android:src="@drawable/ic_delete" />
+    </LinearLayout>
+
+    <!-- 档位数值编辑区 (3 列：触发温度、回退温度、目标限制频率选择) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <!-- 触发温度 trig -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="触发 (trig)"
+                android:textColor="#9CA3AF"
+                android:textSize="11sp" />
+
+            <EditText
+                android:id="@+id/et_trig"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:layout_marginTop="3dp"
+                android:background="@drawable/input_bg"
+                android:gravity="center"
+                android:hint="25000"
+                android:imeOptions="actionNext"
+                android:inputType="numberSigned"
+                android:paddingHorizontal="6dp"
+                android:textColor="#10B981"
+                android:textColorHint="#4B5563"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_trig_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
+                android:text="25.0°C"
+                android:textColor="#10B981"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- 回退温度 clr -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="回退 (clr)"
+                android:textColor="#9CA3AF"
+                android:textSize="11sp" />
+
+            <EditText
+                android:id="@+id/et_clr"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:layout_marginTop="3dp"
+                android:background="@drawable/input_bg"
+                android:gravity="center"
+                android:hint="20000"
+                android:imeOptions="actionNext"
+                android:inputType="numberSigned"
+                android:paddingHorizontal="6dp"
+                android:textColor="#06B6D4"
+                android:textColorHint="#4B5563"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_clr_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
+                android:text="20.0°C"
+                android:textColor="#06B6D4"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- 限制目标 target (下拉列表选择频率) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.3"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="目标频率 (target)"
+                android:textColor="#9CA3AF"
+                android:textSize="11sp" />
+
+            <LinearLayout
+                android:id="@+id/btn_target_select"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:layout_marginTop="3dp"
+                android:background="@drawable/input_bg"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="6dp">
+
+                <TextView
+                    android:id="@+id/tv_target_display"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="2.75 GHz"
+                    android:textColor="#F59E0B"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="▾"
+                    android:textColor="#9CA3AF"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_target_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
+                android:text="2745600 kHz"
+                android:textColor="#F59E0B"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

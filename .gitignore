@@ -1,0 +1,42 @@
+# Gradle and Build outputs
+.gradle/
+build/
+app/build/
+bin/
+out/
+
+# Local configuration (SDK path, credentials)
+local.properties
+
+# Android Studio / IntelliJ / VS Code
+.idea/
+*.iml
+.vscode/
+
+# Compiled files
+*.class
+*.dex
+
+# Built application packages
+*.apk
+*.aar
+*.aab
+
+# Keystore / signing files
+*.jks
+*.keystore
+
+# Native build cache
+.cxx/
+.externalNativeBuild/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary and backup files
+*.bak
+*.tmp
+*.swp
+*~
+
