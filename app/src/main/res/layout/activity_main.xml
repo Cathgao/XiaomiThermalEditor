@@ -257,7 +257,7 @@
                 android:id="@+id/tv_params_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="基础参数 (algo_type / sensor / device / polling)"
+                android:text="基础参数"
                 android:textColor="#9CA3AF"
                 android:textSize="11sp" />
 

@@ -144,7 +144,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="目标频率 (target)"
+                android:text="目标 (target)"
                 android:textColor="#9CA3AF"
                 android:textSize="11sp" />
 
