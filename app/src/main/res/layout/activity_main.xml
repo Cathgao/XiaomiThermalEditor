@@ -203,6 +203,61 @@
                 android:textSize="11sp" />
         </LinearLayout>
 
+        <!-- 非档位参数 (如 algo_type, sensor 等) 可折叠区 (置于档位列表上方，避免编辑档位时遮挡) -->
+        <LinearLayout
+            android:id="@+id/layout_section_params"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/card_bg"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <!-- 基础参数折叠切换标题栏 (点击整行即可展开/收起) -->
+            <LinearLayout
+                android:id="@+id/layout_params_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingVertical="2dp">
+
+                <TextView
+                    android:id="@+id/tv_params_header"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="基础参数"
+                    android:textColor="#9CA3AF"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tv_params_arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/badge_bg"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:text="展开 ▾"
+                    android:textColor="#60A5FA"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <!-- 参数列表容器 (默认折叠收起) -->
+            <LinearLayout
+                android:id="@+id/container_params"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="vertical"
+                android:visibility="gone" />
+        </LinearLayout>
+
         <!-- 档位列表标题与新增档位按钮 -->
         <LinearLayout
             android:id="@+id/layout_tier_header"
@@ -233,7 +288,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- 档位 RecyclerView (支持手势拖动) -->
+        <!-- 档位 RecyclerView (支持手势拖动，占满主要垂直空间) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_tiers"
             android:layout_width="match_parent"
@@ -241,33 +296,8 @@
             android:layout_marginTop="4dp"
             android:layout_weight="1"
             android:clipToPadding="false"
+            android:paddingBottom="4dp"
             android:scrollbars="vertical" />
-
-        <!-- 非档位参数 (如 algo_type, sensor 等) 可折叠/滑动区 -->
-        <LinearLayout
-            android:id="@+id/layout_section_params"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/card_bg"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <TextView
-                android:id="@+id/tv_params_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="基础参数"
-                android:textColor="#9CA3AF"
-                android:textSize="11sp" />
-
-            <LinearLayout
-                android:id="@+id/container_params"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:orientation="vertical" />
-        </LinearLayout>
 
     </LinearLayout>
 

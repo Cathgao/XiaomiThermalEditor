@@ -38,10 +38,15 @@ public class MainActivity extends Activity {
 
     private Spinner spSections;
     private TextView tvSectionBadge;
+    private View layoutSectionParams;
+    private View layoutParamsToggle;
+    private TextView tvParamsHeader;
+    private TextView tvParamsArrow;
     private View layoutTierHeader;
     private Button btnAddTier;
     private RecyclerView rvTiers;
     private LinearLayout containerParams;
+    private boolean isParamsExpanded = false;
     private EditText etRawContent;
 
     private Button btnRestoreBak;
@@ -88,11 +93,18 @@ public class MainActivity extends Activity {
 
         spSections = findViewById(R.id.sp_sections);
         tvSectionBadge = findViewById(R.id.tv_section_badge);
+        layoutSectionParams = findViewById(R.id.layout_section_params);
+        layoutParamsToggle = findViewById(R.id.layout_params_toggle);
+        tvParamsHeader = findViewById(R.id.tv_params_header);
+        tvParamsArrow = findViewById(R.id.tv_params_arrow);
         layoutTierHeader = findViewById(R.id.layout_tier_header);
         btnAddTier = findViewById(R.id.btn_add_tier);
         rvTiers = findViewById(R.id.rv_tiers);
         containerParams = findViewById(R.id.container_params);
         etRawContent = findViewById(R.id.et_raw_content);
+
+        // 基础参数折叠/展开切换
+        layoutParamsToggle.setOnClickListener(v -> toggleParams(!isParamsExpanded));
 
         btnRestoreBak = findViewById(R.id.btn_restore_bak);
         btnRestartService = findViewById(R.id.btn_restart_service);
@@ -311,6 +323,14 @@ public class MainActivity extends Activity {
             tierAdapter.setOnTierChangeListener(() -> {
                 tvSectionBadge.setText(section.getBadgeSummary());
             });
+            tierAdapter.setOnTierFocusListener(position -> {
+                // 编辑档位输入框时，如果基础参数卡片处于展开状态，自动收起以腾出最大编辑高度
+                if (isParamsExpanded) {
+                    toggleParams(false);
+                }
+                // 确保获得焦点的档位卡片平滑滑入视野正中，避免键盘遮挡
+                rvTiers.post(() -> rvTiers.smoothScrollToPosition(position));
+            });
             rvTiers.setAdapter(tierAdapter);
         } else {
             layoutTierHeader.setVisibility(View.GONE);
@@ -321,18 +341,41 @@ public class MainActivity extends Activity {
         renderParams(section);
     }
 
+    private void toggleParams(boolean expand) {
+        isParamsExpanded = expand;
+        containerParams.setVisibility(expand ? View.VISIBLE : View.GONE);
+        tvParamsArrow.setText(expand ? "收起 ▴" : "展开 ▾");
+    }
+
     private void renderParams(ThermalSection section) {
         containerParams.removeAllViews();
         List<ThermalSection.ParamPair> params = section.getParams();
 
         if (params.isEmpty()) {
-            TextView tvEmpty = new TextView(this);
-            tvEmpty.setText("本区域无附加参数");
-            tvEmpty.setTextColor(Color.parseColor("#6B7280"));
-            tvEmpty.setTextSize(11);
-            containerParams.addView(tvEmpty);
+            // 没有非档位参数时，完全隐藏该卡片，彻底不占空间
+            layoutSectionParams.setVisibility(View.GONE);
             return;
         }
+
+        layoutSectionParams.setVisibility(View.VISIBLE);
+
+        // 如果是纯参数模式（无档位），默认展开；若已有档位列表，默认折叠收起
+        if (section.isTierBased()) {
+            toggleParams(false);
+        } else {
+            toggleParams(true);
+        }
+
+        // 组织标题摘要，如 "基础参数 (4项: algo_type / sensor / device 等)"
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < Math.min(params.size(), 3); i++) {
+            if (i > 0) sb.append(" / ");
+            sb.append(params.get(i).key);
+        }
+        if (params.size() > 3) {
+            sb.append(" 等");
+        }
+        tvParamsHeader.setText("基础参数 (" + params.size() + "项: " + sb + ")");
 
         for (ThermalSection.ParamPair p : params) {
             LinearLayout row = new LinearLayout(this);

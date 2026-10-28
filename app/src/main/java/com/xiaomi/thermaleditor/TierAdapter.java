@@ -25,10 +25,15 @@ public class TierAdapter extends RecyclerView.Adapter<TierAdapter.TierViewHolder
         void onTierChanged();
     }
 
+    public interface OnTierFocusListener {
+        void onTierFocused(int position);
+    }
+
     private final ThermalSection section;
     private final List<ThermalTier> tiers;
     private ItemTouchHelper itemTouchHelper;
     private OnTierChangeListener changeListener;
+    private OnTierFocusListener focusListener;
 
     public TierAdapter(ThermalSection section) {
         this.section = section;
@@ -41,6 +46,10 @@ public class TierAdapter extends RecyclerView.Adapter<TierAdapter.TierViewHolder
 
     public void setOnTierChangeListener(OnTierChangeListener listener) {
         this.changeListener = listener;
+    }
+
+    public void setOnTierFocusListener(OnTierFocusListener listener) {
+        this.focusListener = listener;
     }
 
     @NonNull
@@ -65,6 +74,18 @@ public class TierAdapter extends RecyclerView.Adapter<TierAdapter.TierViewHolder
             }
             return false;
         });
+
+        // 输入框获取焦点时通知外部 (用于自动折叠基础参数与自动滚动防遮挡)
+        View.OnFocusChangeListener onFocusChangeListener = (v, hasFocus) -> {
+            if (hasFocus && focusListener != null) {
+                int pos = holder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    focusListener.onTierFocused(pos);
+                }
+            }
+        };
+        holder.etTrig.setOnFocusChangeListener(onFocusChangeListener);
+        holder.etClr.setOnFocusChangeListener(onFocusChangeListener);
 
         // 目标频率列表选择点击
         holder.btnTargetSelect.setOnClickListener(v -> {
