@@ -31,10 +31,19 @@ public class MainActivity extends Activity {
     private TextView tvKeyBadge;
     private TextView tvFilePath;
 
+    private static final int MODE_VISUAL = 0;
+    private static final int MODE_RAW = 1;
+    private static final int MODE_APP_RULES = 2;
+
+    private View layoutFileCard;
     private Button btnTabVisual;
     private Button btnTabRaw;
+    private Button btnTabAppRules;
     private View layoutVisualMode;
     private View layoutRawMode;
+    private View layoutAppRules;
+    private View layoutBottomConfActions;
+    private View layoutBottomRuleActions;
 
     private Spinner spSections;
     private TextView tvSectionBadge;
@@ -65,8 +74,9 @@ public class MainActivity extends Activity {
     private final List<String> sectionNames = new ArrayList<>();
     private ArrayAdapter<String> sectionAdapter;
 
-    private boolean isRawMode = false;
+    private int currentMode = MODE_VISUAL;
     private boolean isUserSelectingSection = true;
+    private AppRulesController appRulesController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,12 +85,14 @@ public class MainActivity extends Activity {
 
         initViews();
         setupRecyclerView();
+        appRulesController = new AppRulesController(this, findViewById(android.R.id.content));
         checkRootAndLoadFiles();
     }
 
     private void initViews() {
         tvDeviceInfo = findViewById(R.id.tv_device_info);
         tvRootStatus = findViewById(R.id.tv_root_status);
+        layoutFileCard = findViewById(R.id.layout_file_card);
         spFiles = findViewById(R.id.sp_files);
         btnReload = findViewById(R.id.btn_reload);
         tvKeyBadge = findViewById(R.id.tv_key_badge);
@@ -88,8 +100,12 @@ public class MainActivity extends Activity {
 
         btnTabVisual = findViewById(R.id.btn_tab_visual);
         btnTabRaw = findViewById(R.id.btn_tab_raw);
+        btnTabAppRules = findViewById(R.id.btn_tab_app_rules);
         layoutVisualMode = findViewById(R.id.layout_visual_mode);
         layoutRawMode = findViewById(R.id.layout_raw_mode);
+        layoutAppRules = findViewById(R.id.layout_app_rules);
+        layoutBottomConfActions = findViewById(R.id.layout_bottom_conf_actions);
+        layoutBottomRuleActions = findViewById(R.id.layout_bottom_rule_actions);
 
         spSections = findViewById(R.id.sp_sections);
         tvSectionBadge = findViewById(R.id.tv_section_badge);
@@ -115,9 +131,8 @@ public class MainActivity extends Activity {
         tvDeviceInfo.setText(model + " (" + device + ") Android " + Build.VERSION.RELEASE);
 
         // 文件切换监听
-        fileAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, fileList);
-        fileAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spFiles.setAdapter(fileAdapter);
+        fileAdapter = new ArrayAdapter<>(this, R.layout.item_spinner_selected, fileList);
+        SpinnerHelper.configure(spFiles, layoutFileCard, fileAdapter);
         spFiles.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -130,9 +145,9 @@ public class MainActivity extends Activity {
         });
 
         // 区域切换监听
-        sectionAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, sectionNames);
-        sectionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spSections.setAdapter(sectionAdapter);
+        View layoutSectionCard = findViewById(R.id.layout_section_card);
+        sectionAdapter = new ArrayAdapter<>(this, R.layout.item_spinner_selected, sectionNames);
+        SpinnerHelper.configure(spSections, layoutSectionCard, sectionAdapter);
         spSections.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -146,8 +161,9 @@ public class MainActivity extends Activity {
         });
 
         // 模式切换
-        btnTabVisual.setOnClickListener(v -> switchMode(false));
-        btnTabRaw.setOnClickListener(v -> switchMode(true));
+        btnTabVisual.setOnClickListener(v -> switchMode(MODE_VISUAL));
+        btnTabRaw.setOnClickListener(v -> switchMode(MODE_RAW));
+        btnTabAppRules.setOnClickListener(v -> switchMode(MODE_APP_RULES));
 
         // 重新加载按钮
         btnReload.setOnClickListener(v -> {
@@ -455,34 +471,51 @@ public class MainActivity extends Activity {
         Toast.makeText(this, "已增加档位 #" + tiers.size() + "，可按住左侧手柄拖动排序", Toast.LENGTH_SHORT).show();
     }
 
-    private void switchMode(boolean raw) {
-        isRawMode = raw;
-        if (raw) {
-            // 切换到源码模式：先序列化当前可视化模型
-            if (currentThermalFile != null) {
-                String text = ThermalParser.serialize(currentThermalFile);
-                etRawContent.setText(text);
-            }
-            layoutVisualMode.setVisibility(View.GONE);
-            layoutRawMode.setVisibility(View.VISIBLE);
-            btnTabVisual.setBackgroundResource(R.drawable.btn_secondary);
-            btnTabVisual.setTextColor(Color.parseColor("#9CA3AF"));
-            btnTabRaw.setBackgroundResource(R.drawable.btn_primary);
-            btnTabRaw.setTextColor(Color.parseColor("#FFFFFF"));
-        } else {
-            // 切换回可视化模式：先从源码反解析
-            String rawText = etRawContent.getText().toString();
-            String currentFileName = (currentThermalFile != null) ? currentThermalFile.getFileName() : "thermal-normal.conf";
-            ThermalCipher.KeyType keyType = (currentThermalFile != null) ? currentThermalFile.getKeyType() : ThermalCipher.KeyType.OLD;
-            currentThermalFile = ThermalParser.parse(rawText, currentFileName, keyType);
+    private void switchMode(int targetMode) {
+        int prevMode = currentMode;
+        currentMode = targetMode;
 
+        if (prevMode == MODE_RAW && targetMode == MODE_VISUAL && currentThermalFile != null) {
+            // 从源码切回可视化模式：反解析源码
+            String rawText = etRawContent.getText().toString();
+            String currentFileName = currentThermalFile.getFileName();
+            ThermalCipher.KeyType keyType = currentThermalFile.getKeyType();
+            currentThermalFile = ThermalParser.parse(rawText, currentFileName, keyType);
             updateSectionList();
-            layoutVisualMode.setVisibility(View.VISIBLE);
-            layoutRawMode.setVisibility(View.GONE);
-            btnTabVisual.setBackgroundResource(R.drawable.btn_primary);
-            btnTabVisual.setTextColor(Color.parseColor("#FFFFFF"));
-            btnTabRaw.setBackgroundResource(R.drawable.btn_secondary);
-            btnTabRaw.setTextColor(Color.parseColor("#9CA3AF"));
+        } else if (prevMode == MODE_VISUAL && targetMode == MODE_RAW && currentThermalFile != null) {
+            // 切换到源码模式：先序列化当前可视化模型
+            String text = ThermalParser.serialize(currentThermalFile);
+            etRawContent.setText(text);
+        }
+
+        boolean isAppRules = (targetMode == MODE_APP_RULES);
+        layoutFileCard.setVisibility(isAppRules ? View.GONE : View.VISIBLE);
+        layoutVisualMode.setVisibility(targetMode == MODE_VISUAL ? View.VISIBLE : View.GONE);
+        layoutRawMode.setVisibility(targetMode == MODE_RAW ? View.VISIBLE : View.GONE);
+        layoutAppRules.setVisibility(isAppRules ? View.VISIBLE : View.GONE);
+
+        layoutBottomConfActions.setVisibility(isAppRules ? View.GONE : View.VISIBLE);
+        layoutBottomRuleActions.setVisibility(isAppRules ? View.VISIBLE : View.GONE);
+
+        styleTabButton(btnTabVisual, targetMode == MODE_VISUAL);
+        styleTabButton(btnTabRaw, targetMode == MODE_RAW);
+        styleTabButton(btnTabAppRules, targetMode == MODE_APP_RULES);
+
+        if (isAppRules && appRulesController != null) {
+            appRulesController.onTabActivated();
+        }
+    }
+
+    private void styleTabButton(Button btn, boolean active) {
+        btn.setBackgroundResource(active ? R.drawable.btn_primary : R.drawable.btn_secondary);
+        btn.setTextColor(Color.parseColor(active ? "#FFFFFF" : "#D1D5DB"));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == AppInfoHelper.REQ_CODE_GET_INSTALLED_APPS && appRulesController != null) {
+            appRulesController.onPermissionResult();
         }
     }
 
@@ -493,7 +526,7 @@ public class MainActivity extends Activity {
         }
 
         String finalContent;
-        if (isRawMode) {
+        if (currentMode == MODE_RAW) {
             finalContent = etRawContent.getText().toString();
         } else {
             finalContent = ThermalParser.serialize(currentThermalFile);

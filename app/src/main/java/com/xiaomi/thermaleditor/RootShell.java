@@ -35,12 +35,32 @@ public class RootShell {
     }
 
     public static CommandResult runSu(String cmd) {
+        return execSu(new String[]{"su"}, cmd);
+    }
+
+    /**
+     * 在全局挂载命名空间 (PID 1) 中执行 Root 命令，突破 Android 11+ /data/data 应用沙箱隔离
+     */
+    public static CommandResult runSuGlobal(String cmd) {
+        CommandResult res = execSu(new String[]{"su", "-M"}, cmd);
+        if (!res.isSuccess() && res.stderr != null
+                && (res.stderr.contains("invalid option") || res.stderr.contains("unrecognized option"))) {
+            return execSu(new String[]{"su"}, "nsenter -t 1 -m -- sh -c " + shellQuote(cmd));
+        }
+        return res;
+    }
+
+    private static String shellQuote(String s) {
+        return "'" + s.replace("'", "'\"'\"'") + "'";
+    }
+
+    private static CommandResult execSu(String[] suCmd, String cmd) {
         StringBuilder stdout = new StringBuilder();
         StringBuilder stderr = new StringBuilder();
         int exitCode = -1;
 
         try {
-            Process process = Runtime.getRuntime().exec("su");
+            Process process = Runtime.getRuntime().exec(suCmd);
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
             BufferedReader is = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
             BufferedReader es = new BufferedReader(new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8));

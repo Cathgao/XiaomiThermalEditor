@@ -50,11 +50,52 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- 目标文件选择卡片 -->
+    <!-- 模式切换：可视化编辑 vs 源码文本 vs 应用规则 (固定在顶部，切换标签不跳动) -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="36dp"
         android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_tab_visual"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/btn_primary"
+            android:text="可视化编辑"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btn_tab_raw"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_secondary"
+            android:text="源码编辑"
+            android:textColor="#D1D5DB"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btn_tab_app_rules"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_secondary"
+            android:text="应用规则"
+            android:textColor="#D1D5DB"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <!-- 目标文件选择卡片 -->
+    <LinearLayout
+        android:id="@+id/layout_file_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:background="@drawable/card_bg"
         android:orientation="vertical"
         android:padding="10dp">
@@ -76,10 +117,11 @@
             <Spinner
                 android:id="@+id/sp_files"
                 android:layout_width="0dp"
-                android:layout_height="36dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/input_bg"
-                android:popupBackground="#1F2937" />
+                android:minHeight="36dp"
+                android:popupBackground="@drawable/popup_bg" />
 
             <Button
                 android:id="@+id/btn_reload"
@@ -127,35 +169,6 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 模式切换：可视化编辑 vs 源码文本 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btn_tab_visual"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/btn_primary"
-            android:text="可视化编辑"
-            android:textColor="#FFFFFF"
-            android:textSize="13sp" />
-
-        <Button
-            android:id="@+id/btn_tab_raw"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/btn_secondary"
-            android:text="源码查看/编辑"
-            android:textColor="#D1D5DB"
-            android:textSize="13sp" />
-    </LinearLayout>
-
     <!-- 可视化编辑视图容器 -->
     <LinearLayout
         android:id="@+id/layout_visual_mode"
@@ -167,12 +180,13 @@
 
         <!-- 区域 (Section) 选择栏 -->
         <LinearLayout
+            android:id="@+id/layout_section_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/card_bg"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -185,10 +199,11 @@
             <Spinner
                 android:id="@+id/sp_sections"
                 android:layout_width="0dp"
-                android:layout_height="34dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/input_bg"
-                android:popupBackground="#1F2937" />
+                android:minHeight="36dp"
+                android:popupBackground="@drawable/popup_bg" />
 
             <TextView
                 android:id="@+id/tv_section_badge"
@@ -324,8 +339,186 @@
             android:typeface="monospace" />
     </LinearLayout>
 
-    <!-- 底部操作按钮栏 -->
+    <!-- 应用规则视图容器 (默认隐藏) -->
     <LinearLayout
+        android:id="@+id/layout_app_rules"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!-- 规则选择卡片 (位置与“配置文件”卡片统一对齐在标签栏下方) -->
+        <LinearLayout
+            android:id="@+id/layout_rule_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_bg"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="温控规则:"
+                    android:textColor="#9CA3AF"
+                    android:textSize="12sp" />
+
+                <Spinner
+                    android:id="@+id/sp_rules"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/input_bg"
+                    android:minHeight="36dp"
+                    android:popupBackground="@drawable/popup_bg" />
+
+                <Button
+                    android:id="@+id/btn_reload_rules"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/btn_secondary"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="10dp"
+                    android:text="重载"
+                    android:textColor="#E5E7EB"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_rule_mapping"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:maxLines="4"
+                    android:text="等待解码 PowerKeeper 数据库..."
+                    android:textColor="#10B981"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tv_rule_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/badge_bg"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:text="0 个"
+                    android:textColor="#60A5FA"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 读取应用列表权限提示卡片 -->
+        <LinearLayout
+            android:id="@+id/layout_app_perm_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/card_bg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="尚未授予「读取应用列表」权限，可能无法显示第三方应用名称和图标"
+                android:textColor="#FBBF24"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_grant_app_perm"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/btn_primary"
+                android:minWidth="0dp"
+                android:paddingHorizontal="10dp"
+                android:text="立即授权"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- 搜索、过滤与添加按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_rule_search"
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:background="@drawable/input_bg"
+                android:hint="搜索应用名..."
+                android:inputType="text"
+                android:paddingHorizontal="10dp"
+                android:singleLine="true"
+                android:textColor="#F9FAFB"
+                android:textColorHint="#6B7280"
+                android:textSize="12sp" />
+
+            <CheckBox
+                android:id="@+id/cb_only_installed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:buttonTint="#3B82F6"
+                android:checked="true"
+                android:text="仅已安装"
+                android:textColor="#9CA3AF"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_add_rule_app"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/btn_primary"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="+ 添加应用"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- 规则内应用列表 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_rule_apps"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="6dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="4dp"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+
+    <!-- 底部操作按钮栏 (温控文件模式) -->
+    <LinearLayout
+        android:id="@+id/layout_bottom_conf_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -360,6 +553,49 @@
             android:layout_weight="1.6"
             android:background="@drawable/btn_primary"
             android:text="保存并加密应用"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 底部操作按钮栏 (应用规则数据库模式) -->
+    <LinearLayout
+        android:id="@+id/layout_bottom_rule_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btn_restore_db_bak"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_secondary"
+            android:text="恢复库备份"
+            android:textColor="#D1D5DB"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btn_restart_powerkeeper"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_secondary"
+            android:text="重启电量服务"
+            android:textColor="#34D399"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btn_save_rules"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1.6"
+            android:background="@drawable/btn_primary"
+            android:text="保存规则到数据库"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
